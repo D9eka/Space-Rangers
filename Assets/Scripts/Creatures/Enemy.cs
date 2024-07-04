@@ -3,10 +3,11 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IDamageable
 {
-    [Header("Prefab")]
+    [Header("Exposion")]
     [SerializeField] private GameObject _explosionPrefab;
+    [SerializeField] private AudioClip[] _explosionSounds;
     [Header("Params")]
     [SerializeField] private float _minSpeed = 2f;
     [SerializeField] private float _maxSpeed = 5f;
@@ -15,8 +16,16 @@ public class Enemy : MonoBehaviour
 
     private float _speed;
     private Vector3 _lastPosition;
+    private bool _active;
 
     public Action<float> Attack;
+
+    public void Damage(int damage)
+    {
+        Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+        AudioManager.Instance.PlaySound(_explosionSounds, transform.position);
+        Destroy(gameObject);
+    }
 
     private void Awake()
     {
@@ -29,10 +38,23 @@ public class Enemy : MonoBehaviour
         _rigidbody.velocity = new Vector3(0, 0, -_speed);
         _rigidbody.transform.rotation = Quaternion.Euler(0, 180, 0);
         _lastPosition = _rigidbody.transform.position;
+
+        Player.Instance.Health.Die += Player_Die;
+    }
+
+    private void Player_Die()
+    {
+        _active = false;
+        _rigidbody.velocity = Vector3.zero;
     }
 
     private void Update()
     {
+        if (!_active)
+        {
+            return;
+        }
+
         if (Player.Instance == null)
         {
             _rigidbody.velocity = new Vector3(0, 0, -_speed);
@@ -61,16 +83,11 @@ public class Enemy : MonoBehaviour
         Attack?.Invoke(angle);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnDestroy()
     {
-        if (other.TryGetComponent(out Boundary _) || (other.TryGetComponent(out Lazer lazer) && lazer.IsEnemyLazer) || 
-            other.TryGetComponent(out PowerUp _) || other.TryGetComponent(out Asteroid _))
-            return;
-
-        Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
-        Destroy(gameObject);
-
-        if (lazer != null && lazer.IsEnemyLazer)
-            Destroy(other.gameObject);
+        if (Player.Instance != null)
+        {
+            Player.Instance.Health.Die -= Player_Die;
+        }
     }
 }

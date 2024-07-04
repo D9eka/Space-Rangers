@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelController : MonoBehaviour
 {
@@ -23,9 +24,10 @@ public class LevelController : MonoBehaviour
         RightBorder = cameraTopRightAngle.x;
         TopBorder = cameraTopRightAngle.z;
         BottomBorder = cameraBottomLeftAngle.z;
+    }
 
-        Debug.Log($"{Width}x{Height}");
-        Debug.Log($"{LeftBorder} - {RightBorder}");
-        Debug.Log($"{BottomBorder} - {TopBorder}");
+    public void Reload()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

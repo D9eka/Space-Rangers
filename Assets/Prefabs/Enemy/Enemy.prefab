@@ -71,6 +71,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _explosionPrefab: {fileID: 1636966638365670007, guid: efe0044efdbff7c4a9b01ae8437cecaf,
     type: 3}
+  _explosionSounds:
+  - {fileID: 8300000, guid: 8524588a69a4f3e40bb597b6221138f1, type: 3}
+  - {fileID: 8300000, guid: fc96116dc3c141440aabb5605744fea2, type: 3}
+  - {fileID: 8300000, guid: c401d00c96b512e488d2e3bf5d111509, type: 3}
+  - {fileID: 8300000, guid: c2153dcd0edd22f40bdebf613271bae7, type: 3}
+  - {fileID: 8300000, guid: 8b3f676fe7b41044495a2964396b8ba3, type: 3}
+  - {fileID: 8300000, guid: f01c623f724825e44a923d1ae50256f2, type: 3}
+  - {fileID: 8300000, guid: fd706038486fee041947a774223dc22e, type: 3}
+  - {fileID: 8300000, guid: c1f8c36ebdb20024ea8a59ec457d582c, type: 3}
+  - {fileID: 8300000, guid: f0bba60dd1813bd40af826dbaa99b983, type: 3}
+  - {fileID: 8300000, guid: d4aee29185389894b9cc0d8873904a49, type: 3}
   _minSpeed: 2
   _maxSpeed: 5
 --- !u!54 &-7741110017048690765
@@ -146,6 +157,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _lazerPrefab: {fileID: 3843476038881971514, guid: ed2a4e33f6daefb4f8cb2e87db85305f,
     type: 3}
+  _sounds:
+  - {fileID: 8300000, guid: dfac0c1a2df2ad74d8be4823300a4f56, type: 3}
+  - {fileID: 8300000, guid: ef60541ebbb9d084289ab5fb98d05231, type: 3}
+  - {fileID: 8300000, guid: 8e5adb3004157f24385e3de1f02cc1ce, type: 3}
+  - {fileID: 8300000, guid: 9270ddc8630a1654bbce8a26e755b058, type: 3}
+  - {fileID: 8300000, guid: 5b8901772ab55c64baaba01ecc55281c, type: 3}
+  - {fileID: 8300000, guid: c5ab43eb861ef3c4db4600527c3ec29b, type: 3}
+  - {fileID: 8300000, guid: 257e13bca8b014b498110dea179a52a1, type: 3}
+  - {fileID: 8300000, guid: 65017124e5ceae045b1c5629d69aa8cb, type: 3}
+  - {fileID: 8300000, guid: 2eb1c3d672cbeec45bb20869e0914179, type: 3}
+  - {fileID: 8300000, guid: 6a83ea895be860c42916d91104e61cdd, type: 3}
+  - {fileID: 8300000, guid: 321c57076d528934aa5e2ed5eb2798ce, type: 3}
+  - {fileID: 8300000, guid: 4a14985fcced5674bb9a3ec19845dc96, type: 3}
+  - {fileID: 8300000, guid: 0800b4854e84ad243a55e1f7a44844f2, type: 3}
+  - {fileID: 8300000, guid: fa5a8beea5991cb4e8fa6302dc57c59f, type: 3}
+  - {fileID: 8300000, guid: 6f8efae2a70a9f54cbdb5dc8dd4e9fd7, type: 3}
+  - {fileID: 8300000, guid: 5752bcbc37b3cb4448f5ea2854f25740, type: 3}
+  - {fileID: 8300000, guid: 98a3c95a6ae178f4b8249ae2b336832c, type: 3}
+  - {fileID: 8300000, guid: fa55a2f8e3fcfc243be4e933bde97de8, type: 3}
+  - {fileID: 8300000, guid: 74fcae481467c404697202c3dad210a8, type: 3}
+  - {fileID: 8300000, guid: c8c4c2fc396c17d4782362c72b190b27, type: 3}
   _type: 2
   _delay: 0.5
   _lazerVelocity: {x: 0, y: 0, z: -50}

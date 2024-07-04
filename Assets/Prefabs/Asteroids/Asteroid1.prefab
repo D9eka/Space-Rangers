@@ -76,11 +76,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _explosionPrefab: {fileID: 8500755562457582972, guid: 67ead55c9da7fe543adde411b077957d,
     type: 3}
-  minSize: 0.7
-  maxSize: 1.3
-  minSpeed: 20
-  maxSpeed: 35
-  rotationSpeed: 10
+  _explosionSounds:
+  - {fileID: 8300000, guid: 8524588a69a4f3e40bb597b6221138f1, type: 3}
+  - {fileID: 8300000, guid: fc96116dc3c141440aabb5605744fea2, type: 3}
+  - {fileID: 8300000, guid: c401d00c96b512e488d2e3bf5d111509, type: 3}
+  - {fileID: 8300000, guid: c2153dcd0edd22f40bdebf613271bae7, type: 3}
+  - {fileID: 8300000, guid: 8b3f676fe7b41044495a2964396b8ba3, type: 3}
+  - {fileID: 8300000, guid: f01c623f724825e44a923d1ae50256f2, type: 3}
+  - {fileID: 8300000, guid: fd706038486fee041947a774223dc22e, type: 3}
+  - {fileID: 8300000, guid: c1f8c36ebdb20024ea8a59ec457d582c, type: 3}
+  - {fileID: 8300000, guid: f0bba60dd1813bd40af826dbaa99b983, type: 3}
+  - {fileID: 8300000, guid: d4aee29185389894b9cc0d8873904a49, type: 3}
+  _minSize: 0.7
+  _maxSize: 1.3
+  _minSpeed: 20
+  _maxSpeed: 35
+  _rotationSpeed: 10
+  _damage: 1
 --- !u!135 &4806295500166797383
 SphereCollider:
   m_ObjectHideFlags: 0

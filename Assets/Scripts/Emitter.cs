@@ -16,6 +16,8 @@ public class Emitter : MonoBehaviour
     private float _enemySpawnDelayCounter;
     private float _bonusSpawnDelayCounter;
 
+    private bool _active = true;
+
     private void Awake()
     {
         _enemySpawnDelayCounter = UnityEngine.Random.Range(_enemyMinSpawnDelay, _enemyMaxSpawnDelay);
@@ -26,10 +28,22 @@ public class Emitter : MonoBehaviour
     {
         transform.position = new Vector3(transform.position.x, transform.position.y, LevelController.Instance.TopBorder + transform.localScale.z);
         transform.localScale = new Vector3(LevelController.Instance.Width, transform.localScale.y, transform.localScale.z);
+
+        Player.Instance.Health.Die += Player_Die;
+    }
+
+    private void Player_Die()
+    {
+        _active = false;
     }
 
     private void Update()
     {
+        if (!_active)
+        {
+            return;
+        }
+
         _enemySpawnDelayCounter -= Time.deltaTime;
         if (_enemySpawnDelayCounter < 0)
         {
@@ -42,7 +56,7 @@ public class Emitter : MonoBehaviour
             SpawnBonus();
         }
 
-        UI.Instance.ChangeBonusText($"До появления бонуса осталось {TimeSpan.FromSeconds(_bonusSpawnDelayCounter):ss} секунд");
+        UI.Instance.ChangeBonusText(_bonusSpawnDelayCounter);
     }
 
     private void SpawnEnemy()

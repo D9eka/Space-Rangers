@@ -1,13 +1,14 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamageable
 {
-    [Header("Prefabs")]
+    [Header("Exposion")]
     [SerializeField] private GameObject _explosionPrefab;
+    [SerializeField] private AudioClip[] _explosionSounds;
     [Header("Shields")]
     [SerializeField] private GameObject[] _shields;
+    [SerializeField] private int _initialActiveShields = 0;
     [Header("Params")]
     [SerializeField] private float _speed = 50f;
     [SerializeField] private float _tilt = 0.3f;
@@ -15,31 +16,21 @@ public class Player : MonoBehaviour
     private Rigidbody _rigidbody;
     private BoxCollider _collider;
 
-    private int _hp;
+    private const int MIN_HP = -1;
 
-    public int HP
-    {
-        get => _hp;
-        private set
-        {
-            _hp = Math.Clamp(value, -1, _shields.Length);
-            if (_hp < 0)
-            {
-                Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
-                Destroy(gameObject);
-
-                UI.Instance.ChangeHPText($"Игра завершена! Вы продержались {TimeSpan.FromSeconds(Time.time).ToString("mm':'ss")}");
-                return;
-            }
-            UI.Instance.ChangeHPText($"Энергетических щитов осталось: {_hp}");
-            for (int i = 0; i < _shields.Length; i++)
-            {
-                _shields[i].SetActive(_hp > i);
-            }
-        }
-    }
+    public HealthComponent Health { get; private set; }
 
     public static Player Instance;
+
+    public void Damage(int damage)
+    {
+        Health.HP -= damage;
+    }
+
+    public void GetPowerUP(int hp)
+    {
+        Health.HP += hp;
+    }
 
     private void Awake()
     {
@@ -47,6 +38,25 @@ public class Player : MonoBehaviour
 
         _rigidbody = GetComponent<Rigidbody>();
         _collider = GetComponent<BoxCollider>();
+
+        Health = new HealthComponent(_initialActiveShields, MIN_HP, _shields.Length);
+        Health.ChangeHP += Health_ChangeHP;
+        Health.Die += Health_Die;
+    }
+
+    private void Health_ChangeHP(int hp)
+    {
+        for (int i = 0; i < _shields.Length; i++)
+        {
+            _shields[i].SetActive(hp > i);
+        }
+    }
+
+    private void Health_Die()
+    {
+        Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
+        AudioManager.Instance.PlaySound(_explosionSounds, transform.position);
+        Destroy(gameObject);
     }
 
     private void Update()
@@ -62,23 +72,7 @@ public class Player : MonoBehaviour
                                                                LevelController.Instance.RightBorder - _collider.size.x / 2);
         float restrictedZ = Mathf.Clamp(_rigidbody.position.z, LevelController.Instance.BottomBorder + _collider.size.z / 2, 
                                                                LevelController.Instance.TopBorder - _collider.size.z / 2);
-        _rigidbody.position = new Vector3(restrictedX, 0, restrictedZ);
-        _rigidbody.rotation = Quaternion.Euler(_tilt * _rigidbody.velocity.z, 0, -_rigidbody.velocity.x * _tilt);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.TryGetComponent(out Boundary _) || (other.TryGetComponent(out Lazer lazer) && !lazer.IsEnemyLazer))
-            return;
-
-        if (other.TryGetComponent(out PowerUp _))
-        {
-            HP++;
-            Destroy(other.gameObject);
-            return;
-        }
-
-        Destroy(other.gameObject);
-        HP--;
+        _rigidbody.position = new Vector3(restrictedX, _rigidbody.position.y, restrictedZ);
+        _rigidbody.rotation = Quaternion.Euler(_tilt * _rigidbody.velocity.z, _rigidbody.rotation.y, -_rigidbody.velocity.x * _tilt);
     }
 }
