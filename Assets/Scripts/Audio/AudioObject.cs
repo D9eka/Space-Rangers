@@ -26,11 +26,11 @@ public class AudioObject : MonoBehaviour
         switch (_type) 
         { 
             case AudioType.Sound:
-                _source.mute = PlayerPrefs.HasKey("Audio") ? PlayerPrefs.GetInt("Audio") == 0 : false;
+                _source.mute = !SaveManager.Instance.GetSoundState();
                 AudioManager.Instance.ChangeSoundState += AudioManager_ChangeSoundState;
                 break;
             case AudioType.Music:
-                _source.mute = PlayerPrefs.HasKey("Music") ? PlayerPrefs.GetInt("Music") == 0 : false;
+                _source.mute = !SaveManager.Instance.GetMusicState();
                 AudioManager.Instance.ChangeMusicState += AudioManager_ChangeMusicState;
                 break;
             default:

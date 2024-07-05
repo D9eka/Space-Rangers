@@ -16,9 +16,9 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private float _speed;
     private Vector3 _lastPosition;
-    private bool _active;
+    private bool _active = true;
 
-    public Action<float> Attack;
+    public Action Attack;
 
     public void Damage(int damage)
     {
@@ -39,19 +39,38 @@ public class Enemy : MonoBehaviour, IDamageable
         _rigidbody.transform.rotation = Quaternion.Euler(0, 180, 0);
         _lastPosition = _rigidbody.transform.position;
 
-        Player.Instance.Health.Die += Player_Die;
+        GameManager.Instance.EndGame += GameManager_EndGame;
+        GameManager.Instance.ClearGame += GameManager_ClearGame;
+
+        GameManager.Instance.PauseGame += GameManager_PauseGame;
+        GameManager.Instance.ResumeGame += GameManager_ResumeGame;
     }
 
-    private void Player_Die()
+    private void GameManager_EndGame()
     {
         _active = false;
-        _rigidbody.velocity = Vector3.zero;
+    }
+
+    private void GameManager_ClearGame()
+    {
+        Destroy(gameObject);
+    }
+
+    private void GameManager_PauseGame()
+    {
+        _active = false;
+    }
+
+    private void GameManager_ResumeGame()
+    {
+        _active = true;
     }
 
     private void Update()
     {
         if (!_active)
         {
+            _rigidbody.velocity = Vector3.zero;
             return;
         }
 
@@ -64,7 +83,7 @@ public class Enemy : MonoBehaviour, IDamageable
         {
             Vector3 playerDirection = Player.Instance.transform.position - _rigidbody.transform.position;
             MoveTo(playerDirection);
-            OnAttack(playerDirection);
+            OnAttack();
         }
         _lastPosition = _rigidbody.transform.position;
     }
@@ -77,17 +96,17 @@ public class Enemy : MonoBehaviour, IDamageable
         _rigidbody.velocity = direction / direction.magnitude * _speed;
     }
 
-    private void OnAttack(Vector3 playerDirection)
+    private void OnAttack()
     {
-        float angle = Vector3.SignedAngle(Vector3.back, playerDirection, Vector3.up);
-        Attack?.Invoke(angle);
+        Attack?.Invoke();
     }
 
     private void OnDestroy()
     {
-        if (Player.Instance != null)
-        {
-            Player.Instance.Health.Die -= Player_Die;
-        }
+        GameManager.Instance.EndGame -= GameManager_EndGame;
+        GameManager.Instance.ClearGame -= GameManager_ClearGame;
+
+        GameManager.Instance.PauseGame -= GameManager_PauseGame;
+        GameManager.Instance.ResumeGame -= GameManager_ResumeGame;
     }
 }

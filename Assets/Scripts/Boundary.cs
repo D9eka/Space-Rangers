@@ -12,7 +12,7 @@ public class Boundary : MonoBehaviour
 
     private void Start()
     {
-        LevelController levelController = LevelController.Instance;
+        LevelManager levelController = LevelManager.Instance;
         _collider.size = new Vector3(levelController.Width, _collider.size.y, levelController.Height);
     }
 
