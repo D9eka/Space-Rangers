@@ -1,20 +1,24 @@
 ﻿using Creatures;
 using Managers;
+using System;
 using UnityEngine;
 
-namespace Objects
+namespace Lazers
 {
-    [RequireComponent (typeof(Rigidbody))]
-    public class PowerUp : MonoBehaviour
+    public class Lazer : MonoBehaviour
     {
-        [SerializeField] private int _hp = 1;
-        [SerializeField] private float _rotationSpeed = 5f;
-        [SerializeField] private float _ttlSeconds;
+        public enum LazerType
+        {
+            Player,
+            Enemy
+        }
+
+        [SerializeField] private int _damage = 1;
+        [SerializeField] private LazerType _type;
 
         private Rigidbody _rigidbody;
 
-        private float _ttlCounter;
-        private bool _active = true;
+        private Vector3 _velocity;
 
         private void Awake()
         {
@@ -23,9 +27,6 @@ namespace Objects
 
         private void Start()
         {
-            _rigidbody.angularVelocity = Vector3.forward * _rotationSpeed;
-            _ttlCounter = _ttlSeconds;
-
             GameManager.Instance.EndGame += GameManager_EndGame;
             GameManager.Instance.ClearGame += GameManager_ClearGame;
 
@@ -35,8 +36,7 @@ namespace Objects
 
         private void GameManager_EndGame()
         {
-            _active = false;
-            _rigidbody.angularVelocity = Vector3.zero;
+            _rigidbody.velocity = Vector3.zero;
         }
 
         private void GameManager_ClearGame()
@@ -46,35 +46,36 @@ namespace Objects
 
         private void GameManager_PauseGame()
         {
-            _active = false;
-            _rigidbody.angularVelocity = Vector3.zero;
+            _velocity = _rigidbody.velocity;
+            _rigidbody.velocity = Vector3.zero;
         }
 
         private void GameManager_ResumeGame()
         {
-            _active = true;
-            _rigidbody.angularVelocity = Vector3.forward * _rotationSpeed;
-        }
-
-        private void FixedUpdate()
-        {
-            if (_active) 
-            {
-                _ttlCounter -= Time.fixedDeltaTime;
-                if ( _ttlCounter < 0 )
-                {
-                    Destroy(gameObject);
-                }
-            }
+            _rigidbody.velocity = _velocity;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.TryGetComponent(out Player player))
+            if (other.TryGetComponent(out IDamageable damageable) && CanDamage(other))
             {
-                player.GetPowerUP(_hp);
+                damageable.Damage(_damage);
+                if (_type == LazerType.Player)
+                {
+                    GameManager.Instance.UpdateScore();
+                }
                 Destroy(gameObject);
             }
+        }
+
+        private bool CanDamage(Collider other)
+        {
+            return _type switch
+            {
+                LazerType.Player => !other.TryGetComponent(out Player _),
+                LazerType.Enemy => !other.TryGetComponent(out Enemy _),
+                _ => throw new NotImplementedException(),
+            };
         }
 
         private void OnDestroy()

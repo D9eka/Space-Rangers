@@ -1,127 +1,130 @@
-using System;
+using Managers;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BackgroundGenerator : MonoBehaviour
+namespace Generators
 {
-    [SerializeField] private GameObject _prefab;
-    [Space]
-    [SerializeField] private float _positionY = -20f;
-    [SerializeField] private float _initialVelocity = 30f; 
-
-    private float _prefabHeight;
-    private Vector3 _scale;
-
-    private LinkedList<Transform> _spawnedPrefabs = new LinkedList<Transform>();
-    private bool _movePrefabs;
-
-    public static BackgroundGenerator Instance { get; private set; }
-
-    private void Start()
+    public class BackgroundGenerator : MonoBehaviour
     {
-        Instance = this;
+        [SerializeField] private GameObject _prefab;
+        [Space]
+        [SerializeField] private float _positionY = -20f;
+        [SerializeField] private float _initialVelocity = 30f; 
 
-        GetInitialValues();
+        private float _prefabHeight;
+        private Vector3 _scale;
 
-        GameManager.Instance.StartGame += GameManager_StartGame;
-        GameManager.Instance.EndGame += GameManager_EndGame;
-        GameManager.Instance.ClearGame += GameManager_ClearGame;
+        private LinkedList<Transform> _spawnedPrefabs = new LinkedList<Transform>();
+        private bool _movePrefabs;
 
-        GameManager.Instance.PauseGame += GameManager_PauseGame;
-        GameManager.Instance.ResumeGame += GameManager_ResumeGame;
-    }
+        public static BackgroundGenerator Instance { get; private set; }
 
-    private void GetInitialValues()
-    {
-        LevelManager levelController = LevelManager.Instance;
-
-        float scale = levelController.Width / _prefab.GetComponent<Renderer>().bounds.size.x;
-        _scale = new Vector3(scale, 1f, scale);
-        _prefabHeight = _prefab.GetComponent<Renderer>().bounds.size.z * scale;
-    }
-
-    private void GameManager_StartGame()
-    {
-        _movePrefabs = true;
-        _spawnedPrefabs.Clear();
-    }
-
-    private void GameManager_EndGame()
-    {
-        _movePrefabs = false;
-        ChangePrefabsSpeed(0f);
-    }
-
-    private void GameManager_ClearGame()
-    {
-        foreach (Transform prefab in _spawnedPrefabs)
+        private void Start()
         {
-            Destroy(prefab.gameObject);
-        }
-        _spawnedPrefabs.Clear();
-    }
+            Instance = this;
 
-    private void GameManager_PauseGame()
-    {
-        _movePrefabs = false;
-        ChangePrefabsSpeed(0f);
-    }
+            GetInitialValues();
 
-    private void GameManager_ResumeGame()
-    {
-        _movePrefabs = true;
-        ChangePrefabsSpeed(_initialVelocity);
-    }
+            GameManager.Instance.StartGame += GameManager_StartGame;
+            GameManager.Instance.EndGame += GameManager_EndGame;
+            GameManager.Instance.ClearGame += GameManager_ClearGame;
 
-    private void ChangePrefabsSpeed(float speed)
-    {
-        foreach (Transform prefab in _spawnedPrefabs)
-        {
-            prefab.GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, -speed);
-        }
-    }
-
-    private void Update()
-    {
-        SpawnPrefab();
-    }
-
-    private void SpawnPrefab()
-    {
-        LevelManager levelController = LevelManager.Instance;
-
-        DestroyInviciblePrefabs(levelController.BottomBorder);
-
-        if (_spawnedPrefabs.Count == 0)
-        {
-            InstantiatePrefab(new Vector3(0f, _positionY, levelController.BottomBorder + _scale.x));
+            GameManager.Instance.PauseGame += GameManager_PauseGame;
+            GameManager.Instance.ResumeGame += GameManager_ResumeGame;
         }
 
-        while (_spawnedPrefabs.Last.Value.position.z < levelController.TopBorder)
+        private void GetInitialValues()
         {
-            InstantiatePrefab(new Vector3(0f, _positionY, _spawnedPrefabs.Last.Value.position.z + _prefabHeight));
-        }
-    }
+            LevelManager levelController = LevelManager.Instance;
 
-    private void DestroyInviciblePrefabs(float bottomBorder)
-    {
-        while (_spawnedPrefabs.First != null &&
-               _spawnedPrefabs.First.Value.position.z + (_prefabHeight / 2) < bottomBorder)
-        {
-            Transform prefab = _spawnedPrefabs.First.Value;
-            _spawnedPrefabs.RemoveFirst();
-            Destroy(prefab.gameObject);
+            float scale = levelController.Width / _prefab.GetComponent<Renderer>().bounds.size.x;
+            _scale = new Vector3(scale, 1f, scale);
+            _prefabHeight = _prefab.GetComponent<Renderer>().bounds.size.z * scale;
         }
-    }
 
-    private void InstantiatePrefab(Vector3 position)
-    {
-        GameObject background = Instantiate(_prefab, position, Quaternion.identity, transform);
-        background.transform.localScale = _scale;
-        if (_movePrefabs)
+        private void GameManager_StartGame()
         {
-            background.GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, -_initialVelocity);
+            _movePrefabs = true;
+            _spawnedPrefabs.Clear();
         }
-        _spawnedPrefabs.AddLast(background.transform);
+
+        private void GameManager_EndGame()
+        {
+            _movePrefabs = false;
+            ChangePrefabsSpeed(0f);
+        }
+
+        private void GameManager_ClearGame()
+        {
+            foreach (Transform prefab in _spawnedPrefabs)
+            {
+                Destroy(prefab.gameObject);
+            }
+            _spawnedPrefabs.Clear();
+        }
+
+        private void GameManager_PauseGame()
+        {
+            _movePrefabs = false;
+            ChangePrefabsSpeed(0f);
+        }
+
+        private void GameManager_ResumeGame()
+        {
+            _movePrefabs = true;
+            ChangePrefabsSpeed(_initialVelocity);
+        }
+
+        private void ChangePrefabsSpeed(float speed)
+        {
+            foreach (Transform prefab in _spawnedPrefabs)
+            {
+                prefab.GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, -speed);
+            }
+        }
+
+        private void Update()
+        {
+            SpawnPrefab();
+        }
+
+        private void SpawnPrefab()
+        {
+            LevelManager levelController = LevelManager.Instance;
+
+            DestroyInviciblePrefabs(levelController.BottomBorder);
+
+            if (_spawnedPrefabs.Count == 0)
+            {
+                InstantiatePrefab(new Vector3(0f, _positionY, levelController.BottomBorder + _scale.x));
+            }
+
+            while (_spawnedPrefabs.Last.Value.position.z < levelController.TopBorder)
+            {
+                InstantiatePrefab(new Vector3(0f, _positionY, _spawnedPrefabs.Last.Value.position.z + _prefabHeight));
+            }
+        }
+
+        private void DestroyInviciblePrefabs(float bottomBorder)
+        {
+            while (_spawnedPrefabs.First != null &&
+                   _spawnedPrefabs.First.Value.position.z + (_prefabHeight / 2) < bottomBorder)
+            {
+                Transform prefab = _spawnedPrefabs.First.Value;
+                _spawnedPrefabs.RemoveFirst();
+                Destroy(prefab.gameObject);
+            }
+        }
+
+        private void InstantiatePrefab(Vector3 position)
+        {
+            GameObject background = Instantiate(_prefab, position, Quaternion.identity, transform);
+            background.transform.localScale = _scale;
+            if (_movePrefabs)
+            {
+                background.GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, -_initialVelocity);
+            }
+            _spawnedPrefabs.AddLast(background.transform);
+        }
     }
 }

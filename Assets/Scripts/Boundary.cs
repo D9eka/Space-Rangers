@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Managers;
+using UnityEngine;
 
 [RequireComponent (typeof(BoxCollider))]
 public class Boundary : MonoBehaviour

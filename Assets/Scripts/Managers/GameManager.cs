@@ -1,102 +1,124 @@
+using Creatures;
 using System;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+namespace Managers
 {
-    private bool _started;
-    private bool _paused;
-
-    public Action StartGame;
-    public Action EndGame;
-    public Action ClearGame;
-
-    public Action PauseGame;
-    public Action ResumeGame;
-
-    public static GameManager Instance;
-
-    public void OnStartGame()
+    public class GameManager : MonoBehaviour
     {
-        ClearGame?.Invoke();
-        StartGame?.Invoke();
-        _started = true;
-    }
+        private bool _started;
+        private bool _paused;
 
-    public void OnClearGame()
-    {
-        ClearGame?.Invoke();
-    }
+        private int _currentScore;
 
-    public void OnResumeGame()
-    {
-        ResumeGame?.Invoke();
-        _paused = false;
-    }
+        public Action StartGame;
+        public Action EndGame;
+        public Action ClearGame;
 
-    public void ReloadGame()
-    {
-        OnEndGame();
-        OnClearGame();
-        _paused = false;
-    }
+        public Action PauseGame;
+        public Action ResumeGame;
 
-    public void QuitGame()
-    {
-        Application.Quit();
-    }
+        public Action<int> UpdatePreviousScore;
+        public Action<int> UpdateCurrentScore;
+        public Action<int> UpdateBestScore;
 
-    private void Awake()
-    {
-        Instance = this;
-    }
+        public static GameManager Instance;
 
-    private void Start()
-    {
-        InputManager.Instance.Interact += GameInput_Interact;
-        InputManager.Instance.Pause += GameInput_Pause;
-        InputManager.Instance.Resume += GameInput_Resume;
-
-        Player.Instance.Health.Die += Player_Die;
-    }
-
-    private void GameInput_Interact()
-    {
-        if (!_started)
+        public void OnStartGame()
         {
-            OnStartGame();
+            ClearGame?.Invoke();
+            StartGame?.Invoke();
+            _started = true;
         }
-    }
 
-    private void GameInput_Pause()
-    {
-        if (!_paused)
+        public void OnClearGame()
         {
-            OnPauseGame();
+            _currentScore = 0;
+            ClearGame?.Invoke();
         }
-    }
 
-    private void GameInput_Resume()
-    {
-        if (_started && _paused)
+        public void OnResumeGame()
         {
-            OnResumeGame();
+            ResumeGame?.Invoke();
+            _paused = false;
         }
-    }
 
-    private void Player_Die()
-    {
-        OnEndGame();
-    }
+        public void UpdateScore()
+        {
+            _currentScore++;
+            UpdateCurrentScore?.Invoke(_currentScore);
+            if (_currentScore > SaveManager.Instance.GetBestScore()) 
+            { 
+                UpdateBestScore?.Invoke(_currentScore);
+            }
+        }
 
-    private void OnEndGame()
-    {
-        EndGame?.Invoke();
-        _started = false;
-    }
+        public void ReloadGame()
+        {
+            OnEndGame();
+            OnClearGame();
+            _paused = false;
+        }
 
-    private void OnPauseGame()
-    {
-        PauseGame?.Invoke();
-        _paused = true;
+        public void QuitGame()
+        {
+            Application.Quit();
+        }
+
+        private void Awake()
+        {
+            Instance = this;
+        }
+
+        private void Start()
+        {
+            InputManager.Instance.Interact += GameInput_Interact;
+            InputManager.Instance.Pause += GameInput_Pause;
+            InputManager.Instance.Resume += GameInput_Resume;
+
+            Player.Instance.Health.Die += Player_Die;
+        }
+
+        private void GameInput_Interact()
+        {
+            if (!_started)
+            {
+                OnStartGame();
+            }
+        }
+
+        private void GameInput_Pause()
+        {
+            if (!_paused)
+            {
+                OnPauseGame();
+            }
+        }
+
+        private void GameInput_Resume()
+        {
+            if (_started && _paused)
+            {
+                OnResumeGame();
+            }
+        }
+
+        private void Player_Die()
+        {
+            OnEndGame();
+        }
+
+        private void OnEndGame()
+        {
+            UpdatePreviousScore?.Invoke(_currentScore);
+            EndGame?.Invoke();
+            _started = false;
+        }
+
+        private void OnPauseGame()
+        {
+            PauseGame?.Invoke();
+            _paused = true;
+        }
     }
 }

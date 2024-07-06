@@ -1,65 +1,65 @@
-using System;
-using TMPro;
+using Screens;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour
+namespace Managers
 {
-    [Header("Screens")]
-    [SerializeField] private GameObject _startScreen;
-    [SerializeField] private GameObject _pauseScreen;
-    [SerializeField] private GameObject _endScreen;
-    [Header("Text")]
-    [SerializeField] private TextMeshProUGUI _endGameText;
-
-    private float _initialTime;
-
-    public static UIManager Instance;
-
-    private void Awake()
+    public class UIManager : MonoBehaviour
     {
-        Instance = this;
-    }
+        public static UIManager Instance;
 
-    private void Start()
-    {
-        GameManager.Instance.StartGame += GameManager_StartGame;
-        GameManager.Instance.EndGame += GameManager_EndGame;
-        GameManager.Instance.ClearGame += GameManager_ClearGame;
+        private void Awake()
+        {
+            Instance = this;
+        }
 
-        GameManager.Instance.PauseGame += GameManager_PauseGame;
-        GameManager.Instance.ResumeGame += GameManager_ResumeGame;
-    }
+        private void Start()
+        {
+            StartScreen.Instance.Activate();
 
-    private void GameManager_StartGame()
-    {
-        _initialTime = Time.time;
+            GameManager.Instance.StartGame += GameManager_StartGame;
+            GameManager.Instance.EndGame += GameManager_EndGame;
+            GameManager.Instance.ClearGame += GameManager_ClearGame;
 
-        _startScreen.SetActive(false);
-        _endScreen.SetActive(false);
-    }
+            GameManager.Instance.PauseGame += GameManager_PauseGame;
+            GameManager.Instance.ResumeGame += GameManager_ResumeGame;
+        }
 
-    private void GameManager_EndGame()
-    {
-        _endScreen.SetActive(true);
-        _endGameText.text = $"Игра завершена! Вы продержались всего {TimeSpan.FromSeconds(Time.time - _initialTime).ToString("mm':'ss")}";
-    }
+        private void GameManager_StartGame()
+        {
+            StartScreen.Instance.Deactivate();
+            EndScreen.Instance.Deactivate();
 
-    private void GameManager_ClearGame()
-    {
-        _pauseScreen.SetActive(false);
-        _endScreen.SetActive(false);
+            InGameScreen.Instance.Activate();
+        }
 
-        _startScreen.SetActive(true);
-    }
+        private void GameManager_EndGame()
+        {
+            InGameScreen.Instance.Deactivate();
 
-    private void GameManager_PauseGame()
-    {
-        _pauseScreen.SetActive(true);
-    }
+            EndScreen.Instance.Activate();
+        }
 
-    private void GameManager_ResumeGame()
-    {
-        _pauseScreen.SetActive(false);
+        private void GameManager_ClearGame()
+        {
+            InGameScreen.Instance.Deactivate();
+            PauseScreen.Instance.Deactivate();
+            EndScreen.Instance.Deactivate();
+
+            StartScreen.Instance.Activate();
+        }
+
+        private void GameManager_PauseGame()
+        {
+            InGameScreen.Instance.Deactivate();
+
+            PauseScreen.Instance.Activate();
+        }
+
+        private void GameManager_ResumeGame()
+        {
+            PauseScreen.Instance.Deactivate();
+
+            InGameScreen.Instance.Activate();
+        }
     }
 }
