@@ -11,21 +11,16 @@ namespace Objects
         [SerializeField] private GameObject _explosionPrefab;
         [SerializeField] private AudioClip[] _explosionSounds;
         [Header("Params")]
-        [SerializeField] private float _minSize = 0.7f;
-        [SerializeField] private float _maxSize = 1.3f;
-        [Space]
-        [SerializeField] private float _minSpeed = 20f;
-        [SerializeField] private float _maxSpeed = 35f;
-        [Space]
         [SerializeField] private float _rotationSpeed = 10f;
         [Space]
         [SerializeField] private int _damage = 1;
 
         private Rigidbody _rigidbody;
 
+        private float _velocity;
         private float _size;
 
-        public void Damage(int damage)
+        public void Damage(int damage = 1)
         {
             GameObject explosion = Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
             explosion.transform.localScale *= _size;
@@ -40,8 +35,12 @@ namespace Objects
 
         private void Start()
         {
-            _rigidbody.transform.localScale *= Random.Range(_minSize, _maxSize);
-            _rigidbody.velocity = new Vector3(0, 0, -Random.Range(_minSpeed, _maxSpeed));
+            DifficultySO _currentDifficulty = DifficultyManager.Instance.CurrentDifficulty;
+            _velocity = Random.Range(_currentDifficulty.AsteroidSpeedRange.Item1, _currentDifficulty.AsteroidSpeedRange.Item2);
+            _size = Random.Range(_currentDifficulty.AsteroidScaleRange.Item1, _currentDifficulty.AsteroidScaleRange.Item2);
+
+            _rigidbody.transform.localScale *= _size;
+            _rigidbody.velocity = new Vector3(0, 0, -_velocity);
             _rigidbody.angularVelocity = Random.insideUnitSphere * _rotationSpeed;
 
             GameManager.Instance.EndGame += GameManager_EndGame;
@@ -70,7 +69,7 @@ namespace Objects
 
         private void GameManager_ResumeGame()
         {
-            _rigidbody.velocity = new Vector3(0, 0, -Random.Range(_minSpeed, _maxSpeed));
+            _rigidbody.velocity = new Vector3(0, 0, -_velocity);
             _rigidbody.angularVelocity = Random.insideUnitSphere * _rotationSpeed;
         }
 
@@ -79,7 +78,7 @@ namespace Objects
             if (other.TryGetComponent(out IDamageable damageable) && !IsFriendlyObject(other))
             {
                 damageable.Damage(_damage);
-                Damage(_damage);
+                Damage();
             }
         }
 

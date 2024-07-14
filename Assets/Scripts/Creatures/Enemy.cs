@@ -1,4 +1,5 @@
-﻿using Managers;
+﻿using Generators;
+using Managers;
 using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -11,19 +12,14 @@ namespace Creatures
         [Header("Exposion")]
         [SerializeField] private GameObject _explosionPrefab;
         [SerializeField] private AudioClip[] _explosionSounds;
-        [Header("Params")]
-        [SerializeField] private float _minSpeed = 2f;
-        [SerializeField] private float _maxSpeed = 5f;
 
         private Rigidbody _rigidbody;
 
         private float _speed;
-        private Vector3 _lastPosition;
+
         private bool _active = true;
 
-        public Action Attack;
-
-        public void Damage(int damage)
+        public void Damage(int damage = 1)
         {
             Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
             AudioManager.Instance.PlaySound(_explosionSounds, transform.position);
@@ -37,10 +33,8 @@ namespace Creatures
 
         private void Start()
         {
-            _speed = Random.Range(_minSpeed, _maxSpeed);
-            _rigidbody.velocity = new Vector3(0, 0, -_speed);
-            _rigidbody.transform.rotation = Quaternion.Euler(0, 180, 0);
-            _lastPosition = _rigidbody.transform.position;
+            DifficultySO currentDifficulty = DifficultyManager.Instance.CurrentDifficulty;
+            _speed = Random.Range(currentDifficulty.EnemySpeedRange.Item1, currentDifficulty.EnemySpeedRange.Item2);
 
             GameManager.Instance.EndGame += GameManager_EndGame;
             GameManager.Instance.ClearGame += GameManager_ClearGame;
@@ -84,24 +78,24 @@ namespace Creatures
             }
             else
             {
-                Vector3 playerDirection = Player.Instance.transform.position - _rigidbody.transform.position;
-                MoveTo(playerDirection);
-                OnAttack();
+                MoveToTarget(Player.Instance.transform);
             }
-            _lastPosition = _rigidbody.transform.position;
         }
 
-        private void MoveTo(Vector3 direction)
+        private void MoveToTarget(Transform target)
         {
-            Vector3 currentDirection = _rigidbody.transform.position - _lastPosition;
-            float angle = Vector3.SignedAngle(direction, currentDirection, Vector3.up);
-            _rigidbody.transform.Rotate(0, -angle, 0);
-            _rigidbody.velocity = direction / direction.magnitude * _speed;
+            Vector3 direction = target.position - transform.position;
+            _rigidbody.velocity = direction.normalized * _speed;
+            transform.LookAt(target);
         }
 
-        private void OnAttack()
+        private void OnTriggerEnter(Collider other)
         {
-            Attack?.Invoke();
+            if (other.TryGetComponent(out Player player))
+            {
+                player.Damage();
+                Damage();
+            }
         }
 
         private void OnDestroy()
@@ -111,6 +105,8 @@ namespace Creatures
 
             GameManager.Instance.PauseGame -= GameManager_PauseGame;
             GameManager.Instance.ResumeGame -= GameManager_ResumeGame;
+
+            ObjectsGenerator.Instance.ReduceEnemyCounter();
         }
     }
 }

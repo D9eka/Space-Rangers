@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3811837704421546354}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 53.48, y: -0.15, z: 18.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -35,7 +35,7 @@ Transform:
   - {fileID: 3816454927984119252}
   - {fileID: 3811837705200760543}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &3811837704421546355
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -82,8 +82,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: c1f8c36ebdb20024ea8a59ec457d582c, type: 3}
   - {fileID: 8300000, guid: f0bba60dd1813bd40af826dbaa99b983, type: 3}
   - {fileID: 8300000, guid: d4aee29185389894b9cc0d8873904a49, type: 3}
-  _minSpeed: 2
-  _maxSpeed: 5
 --- !u!54 &-7741110017048690765
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -136,8 +134,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3811837705200760542}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
-  m_LocalPosition: {x: 0, y: -0.3, z: 5.3}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.3, z: 5.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -170,7 +168,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: d4aee29185389894b9cc0d8873904a49, type: 3}
   _type: 2
   _delay: 0.3
-  _lazerVelocity: {x: 0, y: 0, z: 30}
+  _lazerVelocity: 20
 --- !u!1001 &3811837704756191934
 PrefabInstance:
   m_ObjectHideFlags: 0

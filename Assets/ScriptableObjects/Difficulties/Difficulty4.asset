@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1de604abd72bd184fb6fd0be4459c3c9, type: 3}
+  m_Name: Difficulty4
+  m_EditorClassIdentifier: 
+  _scoreToActivate: 45
+  _backgroundVelocity: 60
+  _enemyMinSpawnDelay: 0.2
+  _enemyMaxSpawnDelay: 0.7
+  _enemySpawnChance: 0.6
+  _maxEnemyCount: 4
+  _bonusSpawnDelay: 16
+  _asteroidMinSpeed: 55
+  _asteroidMaxSpeed: 65
+  _asteroidMinScale: 0.75
+  _asteroidMaxScale: 1.15
+  _enemyMinSpeed: 65
+  _enemyMaxSpeed: 75
+  _enenyMinAttackSpeed: 80
+  _enenyMaxAttackSpeed: 90
+  _enemyAttackDelay: 0.4

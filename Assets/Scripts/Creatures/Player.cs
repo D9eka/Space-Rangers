@@ -27,7 +27,7 @@ namespace Creatures
 
         public static Player Instance;
 
-        public void Damage(int damage)
+        public void Damage(int damage = 1)
         {
             Health.HP -= damage;
         }

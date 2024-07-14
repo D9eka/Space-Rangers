@@ -42,6 +42,7 @@ namespace Screens
             GameManager.Instance.EndGame += GameManager_EndGame;
 
             GameManager.Instance.UpdateCurrentScore += GameManager_UpdateCurrentScore;
+            GameManager.Instance.UpdateBestScore += GameManager_UpdateBestScore;
         }
 
         private void GameManager_StartGame()
@@ -57,6 +58,11 @@ namespace Screens
         private void GameManager_UpdateCurrentScore(int score)
         {
             _currentScoreText.text = $"{CURRENT_SCORE_TEXT} {score}";
+        }
+
+        private void GameManager_UpdateBestScore(int score)
+        {
+            _bestScoreText.text = $"{BEST_SCORE_TEXT} {score}";
         }
     }
 }

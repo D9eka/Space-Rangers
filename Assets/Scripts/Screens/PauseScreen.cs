@@ -1,4 +1,5 @@
 using Managers;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -40,11 +41,17 @@ namespace Screens
             _exitButton.onClick.AddListener(() => GameManager.Instance.ReloadGame());
 
             GameManager.Instance.UpdateCurrentScore += GameManager_UpdateCurrentScore;
+            GameManager.Instance.UpdateBestScore += GameManager_UpdateBestScore;
         }
 
         private void GameManager_UpdateCurrentScore(int score)
         {
             _currentScoreText.text = $"{CURRENT_SCORE_TEXT} {score}";
+        }
+
+        private void GameManager_UpdateBestScore(int score)
+        {
+            _bestScoreText.text = $"{BEST_SCORE_TEXT} {score}";
         }
     }
 }

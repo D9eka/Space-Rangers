@@ -3,6 +3,7 @@ using Managers;
 using System;
 using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Lazers
 {
@@ -15,14 +16,13 @@ namespace Lazers
             Enemy
         }
 
-        [Header("Prefab")]
+        [Header("Prefabs")]
         [SerializeField] private GameObject _lazerPrefab;
-        [Space]
         [SerializeField] private AudioClip[] _sounds;
         [Header("Params")]
         [SerializeField] private LazerGunType _type;
         [SerializeField] private float _delay;
-        [SerializeField] private Vector3 _lazerVelocity;
+        [SerializeField] private float _lazerVelocity;
 
         private bool _delayed;
 
@@ -43,7 +43,9 @@ namespace Lazers
                     InputManager.Instance.AdditionalAttack += GameInput_AdditionalAttack;
                     break;
                 case LazerGunType.Enemy:
-                    GetComponentInParent<Enemy>().Attack += Enemy_Attack;
+                    DifficultySO difficulty = DifficultyManager.Instance.CurrentDifficulty;
+                    _delay = difficulty.EnemyAttackDelay;
+                    _lazerVelocity = Random.Range(difficulty.EnemyAttackSpeedRange.Item1, difficulty.EnemyAttackSpeedRange.Item2);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -82,12 +84,15 @@ namespace Lazers
             Shot();
         }
 
-        private void Enemy_Attack()
+        private void Update()
         {
-            Shot(true);
+            if (!_delayed && _type == LazerGunType.Enemy)
+            {
+                Shot();
+            }
         }
 
-        private void Shot(bool toPlayer = false)
+        private void Shot()
         {
             if (_delayed)
             {
@@ -95,17 +100,8 @@ namespace Lazers
             }
 
             Rigidbody shot = Instantiate(_lazerPrefab, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
-            if (!toPlayer)
-            {
-                shot.velocity = _lazerVelocity;
-            }
-            else
-            {
-                Vector3 playerDirection = Player.Instance.transform.position - shot.position;
-                float angle = Vector3.SignedAngle(Vector3.back, playerDirection, Vector3.up);
-                shot.transform.Rotate(0, angle, 0);
-                shot.velocity = playerDirection / playerDirection.magnitude * _lazerVelocity.z;
-            }
+            shot.transform.rotation = transform.rotation;
+            shot.velocity = shot.transform.forward * _lazerVelocity;
             AudioManager.Instance.PlaySound(_sounds, transform.position);
 
             StartCoroutine(DelayRoutine());

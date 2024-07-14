@@ -1,4 +1,5 @@
 using Managers;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +10,8 @@ namespace Generators
         [SerializeField] private GameObject _prefab;
         [Space]
         [SerializeField] private float _positionY = -20f;
-        [SerializeField] private float _initialVelocity = 30f; 
+
+        private float _velocity;
 
         private float _prefabHeight;
         private Vector3 _scale;
@@ -19,10 +21,13 @@ namespace Generators
 
         public static BackgroundGenerator Instance { get; private set; }
 
-        private void Start()
+        private void Awake()
         {
             Instance = this;
+        }
 
+        private void Start()
+        {
             GetInitialValues();
 
             GameManager.Instance.StartGame += GameManager_StartGame;
@@ -31,6 +36,8 @@ namespace Generators
 
             GameManager.Instance.PauseGame += GameManager_PauseGame;
             GameManager.Instance.ResumeGame += GameManager_ResumeGame;
+
+            DifficultyManager.Instance.ChangeDifficulty += DifficultyManager_ChangeDifficulty;
         }
 
         private void GetInitialValues()
@@ -40,6 +47,8 @@ namespace Generators
             float scale = levelController.Width / _prefab.GetComponent<Renderer>().bounds.size.x;
             _scale = new Vector3(scale, 1f, scale);
             _prefabHeight = _prefab.GetComponent<Renderer>().bounds.size.z * scale;
+
+            _velocity = DifficultyManager.Instance.CurrentDifficulty.BackgroundVelocity;
         }
 
         private void GameManager_StartGame()
@@ -72,7 +81,16 @@ namespace Generators
         private void GameManager_ResumeGame()
         {
             _movePrefabs = true;
-            ChangePrefabsSpeed(_initialVelocity);
+            ChangePrefabsSpeed(_velocity);
+        }
+
+        private void DifficultyManager_ChangeDifficulty(DifficultySO difficultySO)
+        {
+            _velocity = difficultySO.BackgroundVelocity;
+            if (_movePrefabs)
+            {
+                ChangePrefabsSpeed(_velocity);
+            }
         }
 
         private void ChangePrefabsSpeed(float speed)
@@ -122,7 +140,7 @@ namespace Generators
             background.transform.localScale = _scale;
             if (_movePrefabs)
             {
-                background.GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, -_initialVelocity);
+                background.GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, -_velocity);
             }
             _spawnedPrefabs.AddLast(background.transform);
         }
